@@ -1,45 +1,65 @@
-import React, { useState, useEffect } from 'react';
-import './App.css'; 
+import { useEffect, useState } from "react";
 
-const App = () => {
+export default function App() {
   const [countries, setCountries] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchCountries = async () => {
-      try {
-        const response = await fetch('https://restcountries.com/v3.1/all');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.statusText}`);
+    fetch(" https://xcountries-backend.azurewebsites.net/all")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("API error");
         }
-        const data = await response.json();
+        return res.json();
+      })
+      .then((data) => {
         setCountries(data);
-      } catch (error) {
-        setError(error.message);
-        console.error(error);
-      }
-    };
-
-    fetchCountries();
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching data: ", err);
+        setError("Something went wrong");
+        setIsLoading(false);
+      });
   }, []);
 
+  if (isLoading) {
+    return <div>Loading...</div>; // ✅ must match exact test string
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
   return (
-    <div>
-      <h1>Country Flags</h1>
-      {error && <p>Error: {error}</p>}
-      <div className="country-list">
-        {countries.map((country) => (
-          <div key={country.name.common} className="country-card">
-            <img
-              src={country.flags.png}
-              alt={`${country.name.common} flag`}
-            />
-            <p>{country.name.common}</p>
-          </div>
-        ))}
-      </div>
+    <div style={{
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "100vh"
+    }}>
+      {countries.map((country) => (
+        <div key={country.cca3} style={{
+          width: "200px",
+          border: "1px solid #ccc",
+          borderRadius: "10px",
+          margin: "10px",
+          padding: "10px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          <img
+            src={country.flags.png}
+            alt={Flag of ${country.name.common}}
+            style={{ width: "100px", height: "100px" }}
+          />
+          <h2>{country.name.common}</h2>
+        </div>
+      ))}
     </div>
   );
-};
-
-export default App;
+}
