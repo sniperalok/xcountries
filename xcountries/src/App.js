@@ -57,11 +57,13 @@ export default function App() {
             justifyContent: "center",
           }}
         >
-          <img
-            src={country.flags.png}
-            alt={`Flag of ${country.name.common}`} 
-            style={{ width: "100px", height: "100px" }}
-          />
+          {country.flags && (
+  <img
+    src={country.flags.png}
+    alt={`Flag of ${country.name.common}`}
+    style={{ width: "100px", height: "100px" }}
+  />
+)}
           <h2>{country.name.common}</h2>
         </div>
       ))}
