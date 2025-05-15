@@ -6,7 +6,7 @@ export default function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("https://xcountries-backend.azurewebsites.net/all") 
+    fetch("https://xcountries-backend.azurewebsites.net/all")
       .then((res) => {
         if (!res.ok) {
           throw new Error("API error");
@@ -14,18 +14,19 @@ export default function App() {
         return res.json();
       })
       .then((data) => {
+        console.log("Fetched countries:", data); // You can remove this after testing
         setCountries(data);
         setIsLoading(false);
       })
       .catch((err) => {
-        console.error("Error fetching data: ", err);
+        console.error("Error fetching data:", err);
         setError("Something went wrong");
         setIsLoading(false);
       });
   }, []);
 
   if (isLoading) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>; // matches test case
   }
 
   if (error) {
@@ -42,9 +43,9 @@ export default function App() {
         minHeight: "100vh",
       }}
     >
-      {countries.map((country) => (
+      {countries.map((country, index) => (
         <div
-          key={country.cca3}
+          key={index}
           style={{
             width: "200px",
             border: "1px solid #ccc",
@@ -57,14 +58,29 @@ export default function App() {
             justifyContent: "center",
           }}
         >
-          {country.flags && (
-  <img
-    src={country.flags.png}
-    alt={`Flag of ${country.name.common}`}
-    style={{ width: "100px", height: "100px" }}
-  />
-)}
-          <h2>{country.name.common}</h2>
+          {country.flags?.png ? (
+            <img
+              src={country.flags.png}
+              alt={`Flag of ${country.name?.common || "Unknown"}`}
+              style={{ width: "100px", height: "100px", objectFit: "cover" }}
+            />
+          ) : (
+            <div
+              style={{
+                width: "100px",
+                height: "100px",
+                backgroundColor: "#eee",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              No Flag
+            </div>
+          )}
+          <h2 style={{ textAlign: "center", fontSize: "16px" }}>
+            {country.name?.common || "Unknown Country"}
+          </h2>
         </div>
       ))}
     </div>
